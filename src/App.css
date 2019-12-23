@@ -1,22 +1,204 @@
-.App {
+html, body, .App, #root {
+	width: 100%;
+	height: 100%;
+    margin: 0;
+    padding: 0;
+	background-color: rgb(251, 251, 251);
+}
+
+.aside {
+  width: 175px;
+  height: 100%;
+  background-color: transparent;
+  position: fixed;
+  display: block;
+}
+
+.menu {
+  top: 20px;
+	width: 175px;
+	height: auto;
+	padding-bottom: 20px;
+	position: fixed;
+  transition: all .3s ease-in-out;
+  will-change: transform;
+  /*border-right: 1px solid rgba(33, 33, 33, 0.2);*/
+  padding-right: 20px;
+}
+
+.menu-active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.menu-inactive {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.menu > li {
+  text-align: right;
+	list-style-type: none;
+  margin-bottom: 15px;
+	margin-left: 15px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+	font-size: 17px;
+  width: auto;
+  display: table;
+  padding: 10px;
+}
+
+.menu > li > a {
+  color: #333333;
+  transition: all .2s ease-in-out;
+	text-decoration: none;
+}
+
+.menu > li > a:hover {
+	color: #666666;
+}
+
+/*.hamburger {*/
+/*  position: fixed;*/
+/*  top: 35px;*/
+/*  left: 25px;*/
+/*  transition: all .1s ease-in-out;*/
+/*  will-change: transform;*/
+/*}*/
+
+.hamburger-active {
+  opacity: 1;
+  transform: none;
+}
+
+.hamburger-inactive {
+  opacity: 0;
+  transform: translateX(-140%);
+}
+
+
+/* TEST */
+.test > h1 {
   text-align: center;
+  font-family: 'Roboto', sans-serif;
+  padding: 100px 0;
+  font-size: 25px;
 }
 
-.App-logo {
-  height: 40vmin;
+.test > hr {
+  width: 40%;
+  border: none;
+  border-bottom: 1px solid rgba(33, 33, 33, 0.2);
+  margin-bottom: 50px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.test > p {
+  text-align: justify;
+  padding: 0 15%;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  color: #333;
+  font-size: 17px;
 }
 
-.App-link {
-  color: #09d3ac;
+/* TEST */
+
+
+input:focus {
+  outline: none;
 }
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px rgb(251, 251, 251) inset !important;
+}
+
+input::selection {
+  background-color: #444444;
+}
+
+input[type=text], input[type=password], textarea {
+    background-color: rgb(251, 251, 251);
+}
+
+.login > input:nth-child(1) {
+    margin-top: 50px;
+}
+
+.login > input {
+    width: 200px;
+    height: 25px;
+    margin-bottom: 15px;
+    border: none;
+    border-bottom: 2px solid #444444;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    border-radius: 2px;
+}
+
+.login > .submitButton {
+    border: 2px solid #444444;
+    height: auto;
+    padding: 7px 0;
+    cursor: pointer;
+    transition: all .15s ease-in-out;
+    border-radius: 2px;
+}
+
+.login > .submitButton:hover {
+    background-color: #444444;
+    color: white;
+}
+
+.login > .submitButton:focus {
+    outline-width: 0;
+    border-bottom: 2px solid #999999;
+}
+
+.book-card {
+  display: inline-block;
+  width: 290px;
+  height: 225px;
+  margin: 35px 25px;
+  float: left;
+}
+
+.stand {
+  display: inline-block;
+  width: 150px;
+  height: 225px;
+  float: left;
+  overflow: hidden;
+  border-radius: 2px;
+  position: relative;
+  transition: all .1s ease-in-out;
+  vertical-align: top;
+}
+
+.stand > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  vertical-align: top;
+}
+
+.min-book-title {
+  font-family: 'Roboto', sans-serif;
+  color: black;
+  font-weight: bold;
+  font-size: 15px;
+  display: inline-block;
+  float: left;
+  margin: 5px 10px;
+}
+
+.min-book-author {
+  font-family: 'Roboto', sans-serif;
+  color: #666666;
+  font-weight: bold;
+  font-size: 13px;
+  display: inline-block;
+  float: left;
+  margin: 5px 10px;
+}
+
