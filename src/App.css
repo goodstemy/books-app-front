@@ -102,8 +102,33 @@ html, body, .App, #root {
   font-size: 17px;
 }
 
-/* TEST */
+.test {
+  vertical-align: middle;
+}
 
+.write-book-title {
+  border: none;
+  margin-top: 5%;
+  font-size: 50px;
+  text-align: center;
+  width: 800px;
+  height: 200px;
+  font-family: 'Roboto', sans-serif;
+  resize: none;
+}
+
+.write-book-title:focus {
+  outline: none;
+}
+
+.editor {
+  text-align: justify;
+  padding: 0 15%;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  color: #333;
+  font-size: 17px;
+}
 
 input:focus {
   outline: none;
@@ -115,6 +140,7 @@ input:-webkit-autofill {
 
 input::selection {
   background-color: #444444;
+  color: white;
 }
 
 input[type=text], input[type=password], textarea {
@@ -190,6 +216,8 @@ input[type=text], input[type=password], textarea {
   display: inline-block;
   float: left;
   margin: 5px 10px;
+  width: 90px;
+  text-align: left;
 }
 
 .min-book-author {
@@ -200,5 +228,88 @@ input[type=text], input[type=password], textarea {
   display: inline-block;
   float: left;
   margin: 5px 10px;
+  width: 90px;
+  text-align: left;
 }
 
+.search-icon {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  cursor: pointer;
+}
+
+.close-search-icon {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  cursor: pointer;
+}
+
+.search {
+  background-color: rgba(255, 255, 255, 0.45);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+}
+
+.input {
+  width: 60%;
+  height: 40px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  margin-top: 20px;
+  border: none;
+  box-shadow: 0 0 10px 3px rgba(33, 33, 33, 0.15);
+  border-radius: 5px;
+  padding: 2px 15px;
+}
+
+.search-result-item {
+  width: 60%;
+  height: auto;
+  margin-top: 20px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  box-shadow: 0 0 10px 3px rgba(33, 33, 33, 0.1);
+  border-radius: 5px;
+  padding: 5px 50px;
+  background-color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  color: #333333;
+}
+
+.search-result-item > .search-result-item-title {
+  display: inline-block;
+  width: auto;
+  font-weight: 600;
+}
+
+.search-result-item > p {
+  text-align: justify;
+  text-decoration: none;
+}
+
+.search-result-item > hr {
+  border: none;
+  border-bottom: 1px solid rgba(30, 30, 30, 0.2);
+  box-shadow: none;
+}
+
+.search-item-link {
+  text-decoration: none;
+  width: fit-content;
+  display: inline-block;
+}
+
+.search-result-item > .search-result-item-author {
+  display: inline-block;
+  width: auto;
+  margin-left: 90%;
+}

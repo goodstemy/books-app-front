@@ -1,120 +1,129 @@
-import React from 'react';
-import {addCookieHelpers} from './common';
+import React, {useState, useEffect} from 'react';
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+} from "react-router-dom";
+import { ModalProvider } from "react-modal-hook";
+import Modal from 'react-modal';
 import Menu from './components/Menu';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import ReadBook from './components/ReadBook';
+import WriteBook from './components/WriteBook';
 import './App.css';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
+import {getProfile} from './utils/profile-requests';
+import {UserContext} from './store/user-store';
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+function App() {
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    const [user, setUser] = useState({});
 
-    addCookieHelpers();
+    useEffect(() => {
+        if (!document.getCookie('token')) {
+            return setIsLoaded(true);
+        }
 
-    this.state = {
-      isLoaded: false,
-      user: {},
-      isAuthorized: false,
-    };
+        Modal.setAppElement(document.querySelector('.App'));
 
-    this.authenticateHandler = this.authenticateHandler.bind(this);
-    this.logout = this.logout.bind(this);
-  }
+        getProfile()
+            .then(async response => {
+                const {user} = await response;
 
-  async componentDidMount() {
-    fetch('http://localhost:3001/profile', {
-      method: 'GET',
-      accept: '*/*',
-      headers: {
-        'Authorization': `Bearer ${document.getCookie('token') || ''}`
-      }
-    })
-    .then(async response => {
-      if (!response.ok) {
-        return this.setState({
-          user: {},
-          isAuthorized: false,
-          isLoaded: true
-        });
-      }
+                setIsLoaded(true);
+                setIsAuthorized(true);
+                setUser(user);
+            })
+            .catch(error => {
+                console.error(error);
 
-      const {user} = await response.json();
+                setIsLoaded(true);
+            })
+    }, []);
 
-      this.setState({
-        user,
-        isAuthorized: true,
-        isLoaded: true
-      });
-    })
-    .catch(err => {
-      console.error(err);
+    if (isAuthorized) {
+        return (
+            <ModalProvider>
+                <UserContext.Provider value={user}>
+                    <div className="App" style={{display: isLoaded ? 'block' : 'none'}}>
+                        <Router>
+                            <Menu isAuthorized={isAuthorized} logout={() => {
+                                document.deleteCookie('token');
 
-      this.setState({
-        user: {},
-        isAuthorized: false,
-        isLoaded: true
-      });
-    });
-  }
+                                setUser({});
+                                setIsAuthorized({});
 
-  authenticateHandler(user) {
-    this.setState({
-      user,
-      isAuthorized: true,
-    })
-  }
+                                window.location.reload();
+                            }} user={user}/>
 
-  logout() {
-    if (this.state.isAuthorized) {
-      document.deleteCookie('token');
-
-      this.setState({
-        user: {},
-        isAuthorized: false,
-      });
+                            <Switch>
+                                <Route exact path="/">
+                                    <Home isAuthorized={isAuthorized} username={user.username}/>
+                                </Route>
+                                <Route exact path="/profile">
+                                    <Profile isAuthorized={isAuthorized}/>
+                                </Route>
+                                <Route exact path="/read/:id">
+                                    <ReadBook isAuthorized={isAuthorized}/>
+                                </Route>
+                                <Route path="/write/:id">
+                                    <WriteBook isAuthorized={isAuthorized} username={user.username}/>
+                                </Route>
+                                <Route exact path="/login">
+                                    <Login isAuthorized={isAuthorized}
+                                           authenticateHandler={user => {
+                                               setUser(user);
+                                               setIsAuthorized(true);
+                                           }}/>
+                                </Route>
+                                <Route exact path="/signup">
+                                    <SignUp isAuthorized={isAuthorized}/>
+                                </Route>
+                                <Route path="*">
+                                    <center>
+                                        <h1>404 NOT FOUND</h1>
+                                    </center>
+                                </Route>
+                            </Switch>
+                        </Router>
+                    </div>
+                </UserContext.Provider>
+            </ModalProvider>
+        )
     }
-  }
 
-  render() {
     return (
-      <div className="App" style={{display: this.state.isLoaded ? 'block' : 'none'}}>
-        <Router>
-          <Menu isAuthorized={this.state.isAuthorized} logout={this.logout} user={this.state.user}/>
+        <div className="App" style={{display: isLoaded ? 'block' : 'none'}}>
+            <Router>
+                <Menu isAuthorized={isAuthorized}  logout={() => {
+                    console.log('WTF??? You are not logged in!')
+                }}/>
 
-          <Switch>
-            <Route exact path="/">
-              <Home isAuthorized={this.state.isAuthorized}/>
-            </Route>
-            <Route path="/profile">
-              <Profile isAuthorized={this.state.isAuthorized} user={this.state.user}/>
-            </Route>
-            <Route path="/login">
-              <Login isAuthorized={this.state.isAuthorized} authenticateHandler={this.authenticateHandler}/>
-            </Route>
-            <Route path="/signup">
-              <SignUp isAuthorized={this.state.isAuthorized}/>
-            </Route>
-            <Route path="/book">
-              <ReadBook isAuthorized={this.state.isAuthorized}/>
-            </Route>
-            <Route path="*">
-              <center>
-                <h1>404 NOT FOUND</h1>
-              </center>
-            </Route>
-          </Switch>
-        </Router>
-      </div>
+                <Switch>
+                    <Route exact path="/login">
+                        <Login isAuthorized={isAuthorized}
+                               authenticateHandler={user => {
+                                   setUser(user);
+                                   setIsAuthorized(true);
+                               }}/>
+                    </Route>
+                    <Route exact path="/signup">
+                        <SignUp isAuthorized={isAuthorized}/>
+                    </Route>
+                    <Route path="*">
+                        <Login isAuthorized={false}
+                               authenticateHandler={user => {
+                                   setUser(user);
+                                   setIsAuthorized(true);
+                               }}/>
+                    </Route>
+                </Switch>
+            </Router>
+        </div>
     );
-  }
 }
 
 export default App;

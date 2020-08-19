@@ -1,86 +1,64 @@
-import React from 'react';
-import {Redirect} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import {
+    withRouter,
+} from "react-router-dom";
 
-class Login extends React.Component {
-  constructor(props) {
-    super(props);
+const {login} = require('../utils/authentication-requests');
 
-    this.state = {
-      username: '',
-      password: '',
-    };
+let authenticateHandler = null;
 
-    this.authenticate = this.authenticate.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleUsernameChange = this.handleUsernameChange.bind(this);
-    this.handlePasswordChange = this.handlePasswordChange.bind(this);
-  }
+function authenticate(username, password, history) {
+    login(username, password)
+        .then(async response => {
+            const {user, token} = response;
 
-  authenticate() {
-    const body = {
-      username: this.state.username,
-      password: this.state.password,
-    };
+            if (!user || !token) {
+                return alert('Login failed');
+            }
 
-    fetch('http://localhost:3001/login', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      credentials: 'same-origin',
-      body: JSON.stringify(body)
-    })
-    .then(async (response) => {
-      if (response.status !== 200) {
-        const {error} = await response.json();
+            document.setCookie('token', token);
 
-        return alert(error);
-      }
+            authenticateHandler(user);
 
-      const {user, token} = await response.json();
-
-      document.setCookie('token', token);
-
-      this.props.authenticateHandler(user);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-  }
-
-  handleSubmit(event) {
-    this.authenticate();
-    event.preventDefault();
-  }
-
-  handleUsernameChange(event) {
-    this.setState({ username: event.target.value });
-  }
-
-  handlePasswordChange(event) {
-    this.setState({ password: event.target.value });
-  }
-
-  render() {
-    if (this.props.isAuthorized) {
-      return <Redirect to={{pathname: '/profile'}}/>
-    }
-
-    return (
-      <div className="row center-xs">
-        <div className="col-xs">
-          <form className="login" onSubmit={this.handleSubmit}>
-            <input type="text" placeholder="Никнейм" id="username" name="username" value={this.state.username} onChange={this.handleUsernameChange} />
-            <br/>
-            <input type="password" placeholder="Пароль" id="password" name="password" value={this.state.password} onChange={this.handlePasswordChange} />
-            <br/>
-            <input className="submitButton" type="submit" value="Войти" />
-          </form>
-        </div>
-      </div>
-    )
-  }
+            history.push('/profile');
+        })
+        .catch(error => {
+            console.error(error);
+        });
 }
 
-export default Login;
+function Login(props) {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    authenticateHandler = props.authenticateHandler;
+
+    useEffect(() => {
+        const {isAuthorized, history} = props;
+
+        if (isAuthorized) {
+            history.push('/profile');
+        }
+    }, []);
+
+    return (
+        <div className="row center-xs">
+            <div className="col-xs">
+                <form className="login" onSubmit={(e) => {
+                    authenticate(username, password, props.history);
+                    e.preventDefault();
+                }}>
+                    <input type="text" placeholder="Никнейм" id="username" name="username"
+                           value={username} onChange={e => setUsername(e.target.value)}/>
+                    <br/>
+                    <input type="password" placeholder="Пароль" id="password" name="password"
+                           value={password} onChange={e => setPassword(e.target.value)}/>
+                    <br/>
+                    <input className="submitButton" type="submit" value="Войти"/>
+                </form>
+            </div>
+        </div>
+    );
+}
+
+export default withRouter(Login);

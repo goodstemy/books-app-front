@@ -1,90 +1,65 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Link
+    Link, withRouter
 } from "react-router-dom";
 
-class Menu extends React.Component {
-  constructor(props) {
-    super(props);
+function Menu({isAuthorized, logout}) {
+    const [isActive, setIsActive] = useState(true);
+    const [scrollTop, setScrollTop] = useState(0);
+    const [lastScrollPosition, setLastScrollPosition] = useState(0);
 
-    this.state = {
-      isActive: true,
-      lastScrollPosition: 0,
-    };
+    useEffect(() => {
+        const onScroll = e => {
+            const {scrollTop} = e.target.documentElement;
 
-    this.watchScroll = this.watchScroll.bind(this);
-    this.show = this.show.bind(this);
-    this.hide = this.hide.bind(this);
-  }
+            setScrollTop(scrollTop);
+        };
 
-  componentDidMount() {
-    document.addEventListener('scroll', this.watchScroll);
-  }
+        window.addEventListener("scroll", onScroll);
 
-  watchScroll() {
-    const [
-      {scrollTop},
-      {lastScrollPosition},
-    ] = [
-      document.documentElement,
-      this.state,
-    ];
-
-    this.setState({lastScrollPosition: scrollTop});
-
-    if (scrollTop < lastScrollPosition) {
-      return this.show();
-    }
-
-    if (scrollTop > 200) {
-      this.hide();
-    } else {
-      this.show();
-    }
-  }
-
-  show() {
-    this.setState({isActive: true});
-  }
-
-  hide() {
-    this.setState({isActive: false});
-  }
-
-  render() {
-    return (
-      <div style={{height: '100%', position: 'absolute'}}>
-        <div className="aside" onMouseEnter={this.show}></div>
-        {/*<div className={`hamburger hamburger--squeeze js-hamburger ${this.state.isActive ? 'hamburger-inactive' : 'hamburger-active'}`}>*/}
-        {/*  <div className="hamburger-box">*/}
-        {/*    <div className="hamburger-inner"></div>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
-        {this.props.isAuthorized ?
-          <div className={`menu ${this.state.isActive ? 'menu-active' : 'menu-inactive'}`}>
-            <li>
-              <Link to="/">КНИГИ</Link>
-            </li>
-            <li>
-              <Link to="/profile">ПРОФИЛЬ</Link>
-            </li>
-            <li>
-              <a style={{cursor: 'pointer'}} onClick={this.props.logout}>ВЫХОД</a>
-            </li>
-          </div>
-          :
-          <div className={`menu ${this.state.isActive ? 'menu-active' : 'menu-inactive'}`}>
-            <li>
-              <Link to="/login">ВОЙТИ</Link>
-            </li>
-            <li>
-              <Link to="/signup">РЕГИСТРАЦИЯ</Link>
-            </li>
-          </div>
+        if (scrollTop < lastScrollPosition) {
+            setLastScrollPosition(scrollTop + 50);
+            return setIsActive(true);
         }
-      </div>
+
+        setLastScrollPosition(scrollTop);
+
+        if (scrollTop > 200) {
+            setIsActive(false);
+        } else {
+            setIsActive(true);
+        }
+
+        return () => window.removeEventListener("scroll", onScroll);
+    }, [scrollTop]);
+
+    return (
+        <div style={{height: '100%', position: 'absolute'}}>
+            <div className="aside"></div>
+            {isAuthorized ?
+                <div className={`menu ${isActive ? 'menu-active' : 'menu-inactive'}`}>
+                    <li>
+                        <Link to="/">КНИГИ</Link>
+                    </li>
+                    <li>
+                        <Link to="/profile">ПРОФИЛЬ</Link>
+                    </li>
+                    <li>
+                        <a style={{cursor: 'pointer'}} onClick={logout}>ВЫХОД</a>
+                    </li>
+                </div>
+                :
+                <div className={`menu ${isActive ? 'menu-active' : 'menu-inactive'}`}>
+                    <li>
+                        <Link to="/login">ВОЙТИ</Link>
+                    </li>
+                    <li>
+                        <Link to="/signup">РЕГИСТРАЦИЯ</Link>
+                    </li>
+                </div>
+            }
+        </div>
     );
-  }
 }
 
-export default Menu;
+export default withRouter(Menu);
